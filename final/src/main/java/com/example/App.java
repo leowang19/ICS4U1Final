@@ -32,14 +32,17 @@ public class App extends Application {
         stage.setTitle("Contacts");
         stage.setWidth(400);
         stage.setHeight(800);
-        final Label label = new Label("Address Book");
+        final Label label = new Label("Contacts");
         label.setFont(new Font("Arial", 20));
  
         table.setEditable(true);
  
         TableColumn firstNameCol = new TableColumn("First Name");
         TableColumn lastNameCol = new TableColumn("Last Name");
-        TableColumn emailCol = new TableColumn("Email");
+        TableColumn emailCol = new TableColumn("Number");
+        TableColumn firstEmailCol = new TableColumn("Primary");
+        TableColumn secondEmailCol = new TableColumn("Secondary");
+        emailCol.getColumns().addAll(firstEmailCol, secondEmailCol);
         
         table.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
  
