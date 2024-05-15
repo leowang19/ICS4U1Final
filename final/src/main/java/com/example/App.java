@@ -2,9 +2,18 @@ package com.example;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.scene.Group;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+
 
 import java.io.IOException;
 
@@ -15,11 +24,35 @@ public class App extends Application {
 
     private static Scene scene;
 
+    private TableView table = new TableView();
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        //make stage 
+        Scene scene = new Scene(new Group());
+        stage.setTitle("Contacts");
+        stage.setWidth(400);
+        stage.setHeight(800);
+        final Label label = new Label("Address Book");
+        label.setFont(new Font("Arial", 20));
+ 
+        table.setEditable(true);
+ 
+        TableColumn firstNameCol = new TableColumn("First Name");
+        TableColumn lastNameCol = new TableColumn("Last Name");
+        TableColumn emailCol = new TableColumn("Email");
+        
+        table.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
+ 
+        final VBox vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.getChildren().addAll(label, table);
+ 
+        ((Group) scene.getRoot()).getChildren().addAll(vbox);
+
         stage.setScene(scene);
         stage.show();
+        
     }
 
     static void setRoot(String fxml) throws IOException {
