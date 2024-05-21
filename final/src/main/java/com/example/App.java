@@ -24,7 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvWriter;
 
 import java.io.IOException;
 
@@ -57,6 +56,8 @@ public class App extends Application {
         //button
 
         Button add = new Button("add");
+        Button edit = new Button("edit");
+        Button delete = new Button("delete");
         //click logic 
         add.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
@@ -65,9 +66,37 @@ public class App extends Application {
                 newContact.show();
                 Optional<String> result = newContact.showAndWait();
                 String input = result.orElse("");
-                System.out.println(input);
+                // System.out.println(input);
             }
         });
+
+        delete.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                //open 
+                TextInputDialog deleteContact = new TextInputDialog("enter row you want to delete");
+                deleteContact.show();
+                Optional<String> result = deleteContact.showAndWait();
+                String deleted = result.orElse("");
+                
+            }
+        });
+
+        edit.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                //open 
+                TextInputDialog editContactnum = new TextInputDialog("enter row you want to edit");
+                editContactnum.show();
+                Optional<String> result = editContactnum.showAndWait();
+                if(result.orElse("")!=""){
+                    TextInputDialog editContact= new TextInputDialog("enter new contact information");
+                }
+                 
+                // String deleted = result.orElse("");
+                
+            }
+        });
+
+
 
         table.setEditable(true);
         // name of columns
@@ -84,7 +113,7 @@ public class App extends Application {
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, table, add);
+        vbox.getChildren().addAll(label, table, add, edit, delete);
 
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
 
@@ -101,8 +130,8 @@ public class App extends Application {
                 
                 
             }
-            FileWriter outputfile = new FileWriter("C:\\test.csv");
-            CSVWriter writer = new CsvWriter(outputfile);
+            
+            //use buffered file reader 
         } catch (IOException e) {
             e.printStackTrace();
         }
