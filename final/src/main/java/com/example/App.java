@@ -22,8 +22,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 
+// import javax.naming.ConfigurationException;
 
 import java.io.IOException;
 
@@ -36,7 +38,10 @@ public class App extends Application {
 
     private TableView table = new TableView();
     //array to store values of csv 
-    public String data[][] = new String[0][0];
+    public String data[][] = new String[1][1];
+    //array list for row data 
+    public ArrayList<Contact> row = new ArrayList<Contact>();
+    public String test = "";
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -105,9 +110,11 @@ public class App extends Application {
         TableColumn emailCol = new TableColumn("Number");
         TableColumn firstEmailCol = new TableColumn("Primary");
         TableColumn secondEmailCol = new TableColumn("Secondary");
+        TableColumn postalCode = new TableColumn<>("Postal Code");
+        TableColumn email = new TableColumn<>("Email");
         emailCol.getColumns().addAll(firstEmailCol, secondEmailCol);
 
-        table.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
+        table.getColumns().addAll(firstNameCol, lastNameCol, emailCol,postalCode, email);
     
         //where everything is made
         final VBox vbox = new VBox();
@@ -125,8 +132,11 @@ public class App extends Application {
             BufferedReader br = new BufferedReader(new FileReader("C:\\test.csv"));
             while ((line = br.readLine()) != null) // returns a Boolean value
             {
-                String[] employee = line.split(splitBy); // use comma as separator and stores values in an array
-                System.out.println(employee[0]);
+                
+                // String[] employee = line.split(splitBy); // use comma as separator and stores values in an array
+                // Contact person = new Contact(employee[0],employee[1],employee[2],employee[3],employee[4]);
+                // row.add(person);
+
                 
                 
             }
