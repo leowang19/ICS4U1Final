@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -37,6 +38,8 @@ public class App extends Application {
     private static Scene scene;
 
     private TableView table = new TableView();
+    final TextField input = new TextField();
+
     //array to store values of csv 
     public String data[][] = new String[1][1];
     //array list for row data 
@@ -66,12 +69,11 @@ public class App extends Application {
         //click logic 
         add.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                //open 
-                TextInputDialog newContact = new TextInputDialog("enter contact information");
-                newContact.show();
-                Optional<String> result = newContact.showAndWait();
-                // String input = result.orElse("");
-                // System.out.println(input);
+            input.setPromptText("enter new contact information");
+            input.setPrefColumnCount(10);
+            input.getText();
+            
+            
             }
         });
 
@@ -121,6 +123,7 @@ public class App extends Application {
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(label, table, add, edit, delete);
+        vbox.getChildren().add(input);
 
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
 
