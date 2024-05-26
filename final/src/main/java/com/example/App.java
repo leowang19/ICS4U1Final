@@ -70,7 +70,7 @@ public class App extends Application {
                 TextInputDialog newContact = new TextInputDialog("enter contact information");
                 newContact.show();
                 Optional<String> result = newContact.showAndWait();
-                String input = result.orElse("");
+                // String input = result.orElse("");
                 // System.out.println(input);
             }
         });
@@ -132,7 +132,7 @@ public class App extends Application {
             BufferedReader br = new BufferedReader(new FileReader("C:\\test.csv"));
             while ((line = br.readLine()) != null) // returns a Boolean value
             {
-                
+                //issue with array 
                 // String[] employee = line.split(splitBy); // use comma as separator and stores values in an array
                 // Contact person = new Contact(employee[0],employee[1],employee[2],employee[3],employee[4]);
                 // row.add(person);
