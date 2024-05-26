@@ -16,10 +16,11 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.scene.Group;
-import javafx.event.ActionEvent; 
-import javafx.event.EventHandler; 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import java.io.BufferedReader;
@@ -42,8 +43,8 @@ public class App extends Application {
 
     private TableView table = new TableView();
     final TextField input = new TextField();
-    
-    //array list for row data 
+
+    // array list for row data
     public ObservableList<Object> row;
     public String test = "";
 
@@ -59,76 +60,95 @@ public class App extends Application {
         final Label label = new Label("Contacts");
         label.setFont(new Font("Arial", 20));
         input.setVisible(false);
-        //text input 
-        
+        // text input
+
         row = FXCollections.observableArrayList();
 
-        //button
+        // button
 
         Button add = new Button("add");
         Button edit = new Button("edit");
         Button delete = new Button("delete");
         Button submit = new Button("submit");
+        Button closeButton = new Button("Close");
         submit.setVisible(false);
-        //click logic 
+
+        // popup
+        Popup popup = new Popup();
+        VBox popupLayout = new VBox(10);
+        popupLayout.setPadding(new Insets(10));
+        Label popupLabel = new Label("Please enter a valid number.");
+        popupLayout.getChildren().addAll(popupLabel,closeButton);
+        popup.getContent().add(popupLayout);
+
+        // click logic
         add.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                //ideally use this for everything 
-            submit.setVisible(true);
-            input.setVisible(true);
-           
-            input.setPromptText("enter new contact information");
-            submit.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent e) {
-                    String added[] = new String[7];
-                    for (int i = 0; i < added.length; i++) {
-                        added = input.getText().split(",");
-                    }
-                    Contact contact = new Contact(added[0], added[1], added[2], added[3], added[4], added[5]);
-                    row.add(contact);
-                    input.clear();
-                    input.setPromptText(null);
-                    submit.setVisible(false);
-                    input.setVisible(false);
-            
-                }
-            });
-            
-            
-            }
-        });
-        //REMEMBER TO MAKE SURE THEY ARE FORCED TO SUBMIT AN INTEGER 
-        delete.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                //open 
+            @Override
+            public void handle(ActionEvent e) {
+                // ideally use this for everything
                 submit.setVisible(true);
                 input.setVisible(true);
-           
-            input.setPromptText("enter row you want to delete");
-            submit.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent e) {
-                    String deleteRow = input.getText();
-                    System.out.println(deleteRow);
-                    input.clear();
-                    input.setPromptText(null);
-                    submit.setVisible(false);
-                    input.setVisible(false);
-                    
-                }
-            });
-                
+
+                input.setPromptText("enter new contact information");
+                submit.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent e) {
+                        String added[] = new String[7];
+                        for (int i = 0; i < added.length; i++) {
+                            added = input.getText().split(",");
+                        }
+                        Contact contact = new Contact(added[0], added[1], added[2], added[3], added[4], added[5]);
+                        row.add(contact);
+                        input.clear();
+                        input.setPromptText(null);
+                        submit.setVisible(false);
+                        input.setVisible(false);
+
+                    }
+                });
+
+            }
+        });
+        // REMEMBER TO MAKE SURE THEY ARE FORCED TO SUBMIT AN INTEGER
+        delete.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                // open
+                submit.setVisible(true);
+                input.setVisible(true);
+
+                input.setPromptText("enter row you want to delete");
+                submit.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent e) {
+                        String deleteRow = input.getText();
+                        if (onlyDigits(deleteRow, deleteRow.length())) {
+                            int toDelete = Integer.valueOf(deleteRow);
+                            System.out.println(toDelete);
+                            row.remove(toDelete - 1);
+                        } else {
+                            popup.show(stage);
+                        }
+                        input.clear();
+                        input.setPromptText(null);
+                        submit.setVisible(false);
+                        input.setVisible(false);
+
+                    }
+                });
+
             }
         });
 
         edit.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                //open 
-                
-                
+            @Override
+            public void handle(ActionEvent e) {
+                // open
+
             }
         });
 
-
+        closeButton.setOnAction(event -> popup.hide());
 
         table.setEditable(true);
         // name of columns
@@ -158,8 +178,8 @@ public class App extends Application {
 
         table.getColumns().addAll(firstNameCol, lastNameCol, phoneCol, emailCol, addressCol, postalCodeCol);
         table.setItems(row);
-        
-        //where everything is made
+
+        // where everything is made
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
@@ -167,7 +187,6 @@ public class App extends Application {
         vbox.getChildren().add(input);
 
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
-
 
         String line = "";
         String splitBy = ",";
@@ -181,11 +200,10 @@ public class App extends Application {
                 if (data.length == 6) {
                     Contact contact = new Contact(data[0], data[1], data[2], data[3], data[4], data[5]);
                     row.add(contact);
-                } 
+                }
             }
-            
 
-        //use buffered file reader 
+            // use buffered file reader
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -195,7 +213,6 @@ public class App extends Application {
 
     }
 
-    
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
@@ -207,6 +224,24 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    public static boolean onlyDigits(String str, int n) {
+        // Traverse the string from
+        // start to end
+        for (int i = 0; i < n; i++) {
+
+            // Check if character is
+            // not a digit between 0-9
+            // then return false
+            if (str.charAt(i) < '0'
+                    || str.charAt(i) > '9') {
+                return false;
+            }
+        }
+        // If we reach here, that means
+        // all characters were digits.
+        return true;
     }
 
 }
