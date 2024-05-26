@@ -1,6 +1,8 @@
 package com.example;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -11,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -40,11 +43,8 @@ public class App extends Application {
     private TableView table = new TableView();
     final TextField input = new TextField();
     
-
-    //array to store values of csv 
-    public String data[][] = new String[1][1];
     //array list for row data 
-    public ArrayList<Contact> row = new ArrayList<Contact>();
+    public ObservableList<Object> row;
     public String test = "";
 
     @Override
@@ -54,13 +54,14 @@ public class App extends Application {
 
         // size, name, font
         stage.setTitle("Contacts");
-        stage.setWidth(400);
+        stage.setWidth(900);
         stage.setHeight(800);
         final Label label = new Label("Contacts");
         label.setFont(new Font("Arial", 20));
         input.setVisible(false);
         //text input 
         
+        row = FXCollections.observableArrayList();
 
         //button
 
@@ -92,7 +93,7 @@ public class App extends Application {
             
             }
         });
-
+        //REMEMBER TO MAKE SURE THEY ARE FORCED TO SUBMIT AN INTEGER 
         delete.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 //open 
@@ -118,14 +119,7 @@ public class App extends Application {
         edit.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 //open 
-                TextInputDialog editContactnum = new TextInputDialog("enter row you want to edit");
-                editContactnum.show();
-                Optional<String> result = editContactnum.showAndWait();
-                if(result.orElse("")!=""){
-                    TextInputDialog editContact= new TextInputDialog("enter new contact information");
-                }
-                 
-                // String deleted = result.orElse("");
+                
                 
             }
         });
@@ -134,17 +128,33 @@ public class App extends Application {
 
         table.setEditable(true);
         // name of columns
-        TableColumn firstNameCol = new TableColumn("First Name");
-        TableColumn lastNameCol = new TableColumn("Last Name");
-        TableColumn emailCol = new TableColumn("Number");
-        TableColumn firstEmailCol = new TableColumn("Primary");
-        TableColumn secondEmailCol = new TableColumn("Secondary");
-        TableColumn postalCode = new TableColumn<>("Postal Code");
-        TableColumn email = new TableColumn<>("Email");
-        emailCol.getColumns().addAll(firstEmailCol, secondEmailCol);
+        TableColumn<Contact, String> firstNameCol = new TableColumn<>("First Name");
+        firstNameCol.setMinWidth(100);
+        firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
-        table.getColumns().addAll(firstNameCol, lastNameCol, emailCol,postalCode, email);
-    
+        TableColumn<Contact, String> lastNameCol = new TableColumn<>("Last Name");
+        lastNameCol.setMinWidth(100);
+        lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+
+        TableColumn<Contact, String> phoneCol = new TableColumn<>("Phone Number");
+        phoneCol.setMinWidth(100);
+        phoneCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+
+        TableColumn<Contact, String> emailCol = new TableColumn<>("Email");
+        emailCol.setMinWidth(300);
+        emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+
+        TableColumn<Contact, String> addressCol = new TableColumn<>("Address");
+        addressCol.setMinWidth(100);
+        addressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
+
+        TableColumn<Contact, String> postalCodeCol = new TableColumn<>("Postal Code");
+        postalCodeCol.setMinWidth(100);
+        postalCodeCol.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+
+        table.getColumns().addAll(firstNameCol, lastNameCol, phoneCol, emailCol, addressCol, postalCodeCol);
+        table.setItems(row);
+        
         //where everything is made
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
@@ -157,21 +167,21 @@ public class App extends Application {
 
         String line = "";
         String splitBy = ",";
+        Contact person;
         try {
             // parsing a CSV file into BufferedReader class constructor
             BufferedReader br = new BufferedReader(new FileReader("C:\\test.csv"));
             while ((line = br.readLine()) != null) // returns a Boolean value
             {
-                //issue with array 
-                // String[] employee = line.split(splitBy); // use comma as separator and stores values in an array
-                // Contact person = new Contact(employee[0],employee[1],employee[2],employee[3],employee[4]);
-                // row.add(person);
-
-                
-                
+                String[] data = line.split(",");
+                if (data.length == 6) {
+                    Contact contact = new Contact(data[0], data[1], data[2], data[3], data[4], data[5]);
+                    row.add(contact);
+                } 
             }
             
-            //use buffered file reader 
+
+        //use buffered file reader 
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -181,6 +191,7 @@ public class App extends Application {
 
     }
 
+    
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
