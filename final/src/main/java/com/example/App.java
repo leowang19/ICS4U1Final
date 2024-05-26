@@ -39,6 +39,7 @@ public class App extends Application {
 
     private TableView table = new TableView();
     final TextField input = new TextField();
+    
 
     //array to store values of csv 
     public String data[][] = new String[1][1];
@@ -57,7 +58,7 @@ public class App extends Application {
         stage.setHeight(800);
         final Label label = new Label("Contacts");
         label.setFont(new Font("Arial", 20));
-
+        input.setVisible(false);
         //text input 
         
 
@@ -66,12 +67,27 @@ public class App extends Application {
         Button add = new Button("add");
         Button edit = new Button("edit");
         Button delete = new Button("delete");
+        Button submit = new Button("submit");
+        submit.setVisible(false);
         //click logic 
         add.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
+                //ideally use this for everything 
+            submit.setVisible(true);
+            input.setVisible(true);
+           
             input.setPromptText("enter new contact information");
-            input.setPrefColumnCount(10);
-            input.getText();
+            submit.setOnAction(new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent e) {
+                    String added = input.getText();
+                    System.out.println(added);
+                    input.clear();
+                    input.setPromptText(null);
+                    submit.setVisible(false);
+                    input.setVisible(false);
+            
+                }
+            });
             
             
             }
@@ -80,10 +96,21 @@ public class App extends Application {
         delete.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 //open 
-                TextInputDialog deleteContact = new TextInputDialog("enter row you want to delete");
-                deleteContact.show();
-                Optional<String> result = deleteContact.showAndWait();
-                String deleted = result.orElse("");
+                submit.setVisible(true);
+                input.setVisible(true);
+           
+            input.setPromptText("enter row you want to delete");
+            submit.setOnAction(new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent e) {
+                    String deleteRow = input.getText();
+                    System.out.println(deleteRow);
+                    input.clear();
+                    input.setPromptText(null);
+                    submit.setVisible(false);
+                    input.setVisible(false);
+                    
+                }
+            });
                 
             }
         });
@@ -122,7 +149,7 @@ public class App extends Application {
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, table, add, edit, delete);
+        vbox.getChildren().addAll(label, table, add, edit, delete, submit);
         vbox.getChildren().add(input);
 
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
