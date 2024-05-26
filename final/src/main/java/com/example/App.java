@@ -80,8 +80,12 @@ public class App extends Application {
             input.setPromptText("enter new contact information");
             submit.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent e) {
-                    String added = input.getText();
-                    System.out.println(added);
+                    String added[] = new String[7];
+                    for (int i = 0; i < added.length; i++) {
+                        added = input.getText().split(",");
+                    }
+                    Contact contact = new Contact(added[0], added[1], added[2], added[3], added[4], added[5]);
+                    row.add(contact);
                     input.clear();
                     input.setPromptText(null);
                     submit.setVisible(false);
