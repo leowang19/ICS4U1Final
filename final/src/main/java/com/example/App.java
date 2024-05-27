@@ -45,8 +45,7 @@ public class App extends Application {
     final TextField input = new TextField();
 
     // array list for row data
-    public ObservableList<Object> row;
-    public String test = "";
+    public ObservableList<Contact> row;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -78,7 +77,7 @@ public class App extends Application {
         VBox popupLayout = new VBox(10);
         popupLayout.setPadding(new Insets(10));
         Label popupLabel = new Label("Please enter a valid number.");
-        popupLayout.getChildren().addAll(popupLabel,closeButton);
+        popupLayout.getChildren().addAll(popupLabel, closeButton);
         popup.getContent().add(popupLayout);
 
         // click logic
@@ -124,7 +123,7 @@ public class App extends Application {
                         String deleteRow = input.getText();
                         if (onlyDigits(deleteRow, deleteRow.length())) {
                             int toDelete = Integer.valueOf(deleteRow);
-                            System.out.println(toDelete);
+                            
                             row.remove(toDelete - 1);
                         } else {
                             popup.show(stage);
@@ -143,8 +142,46 @@ public class App extends Application {
         edit.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                // open
+                submit.setVisible(true);
+                input.setVisible(true);
+                input.setPromptText("enter row you want to edit");
+                
+                submit.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent e) {
+                        String editRow = input.getText();
+                        if (onlyDigits(editRow, editRow.length())) {
+                            input.clear();
+                            int toEdit = Integer.valueOf(editRow);
+                            
+                            if (toEdit > 0 && toEdit <= row.size()) {
+                                Contact contact = row.get(toEdit-1);
+                                row.remove(toEdit-1);
+                                String contactInfo = contact.getFirstName() + "," + contact.getLastName() + ","
+                                        + contact.getPhoneNumber() + "," + contact.getEmail() + ","
+                                        + contact.getAddress() + "," + contact.getPostalCode();
+                                input.setText(contactInfo);
+                            }
+                            submit.setOnAction(new EventHandler<ActionEvent>() {
+                                @Override
+                                public void handle(ActionEvent e) {
+                                    String added[] = new String[7];
+                                    for (int i = 0; i < added.length; i++) {
+                                        added = input.getText().split(",");
+                                    }
+                                    Contact contact = new Contact(added[0], added[1], added[2], added[3], added[4], added[5]);
+                                    row.add(contact);
+                                    input.clear();
+                                    input.setPromptText(null);
+                                    submit.setVisible(false);
+                                    input.setVisible(false);
+            
+                                }
+                            });
+                        }
 
+                    }
+                });
             }
         });
 
@@ -227,20 +264,15 @@ public class App extends Application {
     }
 
     public static boolean onlyDigits(String str, int n) {
-        // Traverse the string from
-        // start to end
+        // Traverse the string
         for (int i = 0; i < n; i++) {
 
-            // Check if character is
-            // not a digit between 0-9
-            // then return false
+            // Check if character
             if (str.charAt(i) < '0'
                     || str.charAt(i) > '9') {
                 return false;
             }
         }
-        // If we reach here, that means
-        // all characters were digits.
         return true;
     }
 
