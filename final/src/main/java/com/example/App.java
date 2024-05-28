@@ -14,7 +14,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -22,13 +27,21 @@ import javafx.scene.Group;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.geometry.Insets;
+import javafx.scene.paint.Color;
 
 // import javax.naming.ConfigurationException;
 
@@ -54,7 +67,7 @@ public class App extends Application {
 
         // size, name, font
         stage.setTitle("Contacts");
-        stage.setWidth(900);
+        stage.setWidth(950);
         stage.setHeight(800);
         final Label label = new Label("Contacts");
         label.setFont(new Font("Arial", 20));
@@ -63,6 +76,8 @@ public class App extends Application {
 
         row = FXCollections.observableArrayList();
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> saveDataToCSV("C:\\test.csv")));
+        
         // button
 
         Button add = new Button("add");
@@ -81,113 +96,82 @@ public class App extends Application {
         popup.getContent().add(popupLayout);
 
         // click logic
-        add.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                // ideally use this for everything
-                submit.setVisible(true);
-                input.setVisible(true);
-
-                input.setPromptText("enter new contact information");
-                submit.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent e) {
-                        String added[] = new String[7];
-                        for (int i = 0; i < added.length; i++) {
-                            added = input.getText().split(",");
-                        }
-                        Contact contact = new Contact(added[0], added[1], added[2], added[3], added[4], added[5]);
-                        row.add(contact);
-                        input.clear();
-                        input.setPromptText(null);
-                        submit.setVisible(false);
-                        input.setVisible(false);
-
-                    }
-                });
-
-            }
-        });
-        // REMEMBER TO MAKE SURE THEY ARE FORCED TO SUBMIT AN INTEGER
-        delete.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                // open
-                submit.setVisible(true);
-                input.setVisible(true);
-
-                input.setPromptText("enter row you want to delete");
-                submit.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent e) {
-                        String deleteRow = input.getText();
-                        if (onlyDigits(deleteRow, deleteRow.length())) {
-                            int toDelete = Integer.valueOf(deleteRow);
-                            
-                            row.remove(toDelete - 1);
-                        } else {
-                            popup.show(stage);
-                        }
-                        input.clear();
-                        input.setPromptText(null);
-                        submit.setVisible(false);
-                        input.setVisible(false);
-
-                    }
-                });
-
-            }
+        add.setOnAction(e -> {
+            input.clear();
+            submit.setVisible(true);
+            input.setVisible(true);
+            input.setPromptText("enter new contact information");
+            submit.setOnAction(event -> {
+                String[] added = input.getText().split(",");
+                if (added.length == 7) {
+                    Contact contact = new Contact(added[0], added[1], added[2], added[3], added[4], added[5], added[6]);
+                    row.add(contact);
+                    input.clear();
+                    input.setPromptText(null);
+                    submit.setVisible(false);
+                    input.setVisible(false);
+                }
+            });
         });
 
-        edit.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                submit.setVisible(true);
-                input.setVisible(true);
-                input.setPromptText("enter row you want to edit");
-                
-                submit.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent e) {
-                        String editRow = input.getText();
-                        if (onlyDigits(editRow, editRow.length())) {
-                            input.clear();
-                            int toEdit = Integer.valueOf(editRow);
-                            
-                            if (toEdit > 0 && toEdit <= row.size()) {
-                                Contact contact = row.get(toEdit-1);
-                                row.remove(toEdit-1);
-                                String contactInfo = contact.getFirstName() + "," + contact.getLastName() + ","
-                                        + contact.getPhoneNumber() + "," + contact.getEmail() + ","
-                                        + contact.getAddress() + "," + contact.getPostalCode();
-                                input.setText(contactInfo);
+        delete.setOnAction(e -> {
+            input.clear();
+            submit.setVisible(true);
+            input.setVisible(true);
+            input.setPromptText("enter row you want to delete");
+            submit.setOnAction(event -> {
+                String deleteRow = input.getText();
+                if (onlyDigits(deleteRow, deleteRow.length())) {
+                    int toDelete = Integer.valueOf(deleteRow);
+                    row.remove(toDelete - 1);
+                    input.clear();
+                    input.setPromptText(null);
+                    submit.setVisible(false);
+                    input.setVisible(false);
+                } else {
+                    popup.show(stage);
+                }
+            });
+        });
+
+        edit.setOnAction(e -> {
+            input.clear();
+            submit.setVisible(true);
+            input.setVisible(true);
+            input.setPromptText("enter row you want to edit");
+            submit.setOnAction(event -> {
+                String editRow = input.getText();
+                if (onlyDigits(editRow, editRow.length())) {
+                    input.clear();
+                    int toEdit = Integer.valueOf(editRow);
+                    if (toEdit > 0 && toEdit <= row.size()) {
+                        Contact contact = row.get(toEdit - 1);
+                        row.remove(toEdit - 1);
+                        String contactInfo = contact.getFirstName() + "," + contact.getLastName() + ","
+                                + contact.getPhoneNumber() + "," + contact.getEmail() + ","
+                                + contact.getAddress() + "," + contact.getPostalCode() + "," + contact.getActivity();
+                        input.setText(contactInfo);
+                        submit.setOnAction(event2 -> {
+                            String[] added = input.getText().split(",");
+                            if (added.length == 7) {
+                                Contact newContact = new Contact(added[0], added[1], added[2], added[3], added[4],
+                                        added[5], added[6]);
+                                row.add(newContact);
+                                input.clear();
+                                input.setPromptText(null);
+                                submit.setVisible(false);
+                                input.setVisible(false);
                             }
-                            submit.setOnAction(new EventHandler<ActionEvent>() {
-                                @Override
-                                public void handle(ActionEvent e) {
-                                    String added[] = new String[7];
-                                    for (int i = 0; i < added.length; i++) {
-                                        added = input.getText().split(",");
-                                    }
-                                    Contact contact = new Contact(added[0], added[1], added[2], added[3], added[4], added[5]);
-                                    row.add(contact);
-                                    input.clear();
-                                    input.setPromptText(null);
-                                    submit.setVisible(false);
-                                    input.setVisible(false);
-            
-                                }
-                            });
-                        }
-
+                        });
                     }
-                });
-            }
+                }
+            });
         });
 
         closeButton.setOnAction(event -> popup.hide());
 
         table.setEditable(true);
+
         // name of columns
         TableColumn<Contact, String> firstNameCol = new TableColumn<>("First Name");
         firstNameCol.setMinWidth(100);
@@ -213,10 +197,16 @@ public class App extends Application {
         postalCodeCol.setMinWidth(100);
         postalCodeCol.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
 
-        table.getColumns().addAll(firstNameCol, lastNameCol, phoneCol, emailCol, addressCol, postalCodeCol);
+        TableColumn<Contact, String> activityCol = new TableColumn<>("Activity");
+        activityCol.setMinWidth(100);
+        activityCol.setCellValueFactory(new PropertyValueFactory<>("activity"));
+        activityCol.setCellFactory(col -> new ActivityCell());
+        activityCol.setOnEditCommit(event -> event.getRowValue().setActivity(event.getNewValue()));
+
+        table.getColumns().addAll(firstNameCol, lastNameCol, phoneCol, emailCol, addressCol, postalCodeCol,
+                activityCol);
         table.setItems(row);
 
-        // where everything is made
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
@@ -225,29 +215,22 @@ public class App extends Application {
 
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
 
-        String line = "";
+        String line;
         String splitBy = ",";
-        Contact person;
-        try {
-            // parsing a CSV file into BufferedReader class constructor
-            BufferedReader br = new BufferedReader(new FileReader("C:\\test.csv"));
-            while ((line = br.readLine()) != null) // returns a Boolean value
-            {
-                String[] data = line.split(",");
-                if (data.length == 6) {
-                    Contact contact = new Contact(data[0], data[1], data[2], data[3], data[4], data[5]);
+        try (BufferedReader br = new BufferedReader(new FileReader("C:\\test.csv"))) {
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(splitBy);
+                if (data.length == 7) {
+                    Contact contact = new Contact(data[0], data[1], data[2], data[3], data[4], data[5], data[6]);
                     row.add(contact);
                 }
             }
-
-            // use buffered file reader
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         stage.setScene(scene);
         stage.show();
-
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -276,4 +259,46 @@ public class App extends Application {
         return true;
     }
 
+    private static class ActivityCell extends TableCell<Contact, String> {
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setText(null);
+                setBackground(null);
+            } else {
+                Contact contact = (Contact) getTableRow().getItem();
+                setText(item);
+                if (contact != null && contact.getActivity() != null) {
+                    if (contact.getActivity().contains("online")) {
+                        setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+                    } else if (contact.getActivity().contains("offline")) {
+                        setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+                    } else {
+                        setBackground(null);
+                    }
+                } else {
+                    setBackground(null);
+                }
+            }
+        }
+    }
+    private void saveDataToCSV(String fileName) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName), true)
+        )) {
+            for (Contact person : row) { // Assuming 'row' is your ObservableList<Contact>
+                bw.write(String.format("%s,%s,%s,%s,%s,%s,%s%n",
+                        person.getFirstName(),
+                        person.getLastName(),
+                        person.getPhoneNumber(),
+                        person.getEmail(),
+                        person.getAddress(),
+                        person.getPostalCode(),
+                        person.getActivity()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+

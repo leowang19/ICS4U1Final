@@ -7,19 +7,21 @@ public class Contact {
     private String email;
     private String address;
     private String postalCode;
+    private String activity; 
 
     // Constructor
     public Contact(String firstName, String lastName, String phoneNumber, String email, String address,
-            String postalCode) {
+                   String postalCode, String activity) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
         this.postalCode = postalCode;
-
+        this.activity = activity; 
     }
 
+    // Getters and setters for all fields
     public String getFirstName() {
         return firstName;
     }
@@ -66,5 +68,13 @@ public class Contact {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public String getActivity() {
+        return activity;
+    }
+
+    public void setActivity(String activity) {
+        this.activity = activity;
     }
 }
